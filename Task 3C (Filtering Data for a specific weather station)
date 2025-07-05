@@ -1,0 +1,244 @@
+package app;
+
+import io.javalin.http.Context;
+import io.javalin.http.Handler;
+
+public class PageST3C implements Handler {
+
+    public static final String URL = "/SingleStation.html";
+
+    @Override
+    public void handle(Context context) throws Exception {
+        String html = "<html>";
+        html += """
+
+        <head>
+            <title>My Page</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+            <link rel='stylesheet' type='text/css' href='common.css' />
+            <meta charset="UTF-8">
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background: #F0F0F0;
+                }
+                header {
+                    background: #fff;
+                    padding: 15px 30px;
+                    box-shadow: 0 2px 4px rgba(10, 10, 9, 0.1);
+                }
+                nav a {
+                    margin-right: 15px;
+                    text-decoration: none;
+                    color: #333;
+                }
+                main {
+                    padding: 20px 30px;
+                }
+                h2, h3 {
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                }
+                .filters, .note, .table-section, .summary, .thankyou {
+                    background: #F0F0F0;
+                    margin: 10px 0;
+                    padding: 15px;
+                    border-radius: 8px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+                .filters select, .filters input {
+                    margin-right: 10px;
+                    padding: 5px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 10px;
+                }
+                th, td {
+                    border: 1px solid #ccc;
+                    padding: 8px;
+                    text-align: center;
+                }
+                .dropdowns {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 20px;
+                    margin-bottom: 10px;
+                }
+                .dropdowns div {
+                    background: #fff;
+                    padding: 10px;
+                    border-radius: 6px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                footer {
+                    background-color: #A5A9A6;
+                    color: black;
+                    padding: 30px 0;
+                    text-align: center;
+                    font-family: Arial, sans-serif;
+                }
+                footer h2 {
+                    margin: 0 0 10px 0;
+                }
+                footer p {
+                    margin: 0 0 20px 0;
+                }
+                .policy-button {
+                    padding: 10px 20px;
+                    background-color: #f0f0f0;
+                    border: none;
+                    font-weight: bold;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    margin-bottom: 20px;
+                }
+                .footer-columns {
+                    display: flex;
+                    justify-content: center;
+                    gap: 40px;
+                    flex-wrap: wrap;
+                    margin-top: 10px;
+                }
+                .footer-columns div {
+                    text-align: left;
+                }
+                .footer-columns a {
+                    display: block;
+                    color: purple;
+                    text-decoration: none;
+                    margin: 4px 0;
+                }
+            </style>
+        </head>
+
+        <body>
+            <div class='site-header'>
+                <div class='site-title'>Anthropomorphic Climate Change</div>
+                <div class='site-nav'>
+                    <a href='/'>Home</a>
+                    <div class="dropdown">
+                        <a class="dropbtn">Topics</a>
+                        <div class="dropdown-content">
+                            <a href='/QualityAnalysis.html'>Climate Quality Data Analysis (Task-1C)</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a class="dropbtn">Research</a>
+                        <div class="dropdown-content">
+                            
+                            <a href='/MetricsTrendsPage.html'>Climate Metric Trends Over Time</a>
+                            <a href='/SelectedData.html'>Selected Data of Stations (Task-2C)</a>
+                            <a href='/SingleStation.html'>Metrics Recorded at a Single Station (Task-3C)</a>
+                            <a href='/MetricsPage.html'>Climate Metric Measurements</a>
+                        </div>
+                    </div>
+                    
+                    <a href='/mission.html'>About</a>
+                    <a href='/help'>Help</a>
+                </div>
+            </div>
+        """;
+
+        html += """
+            <div class='header'>
+                <h1>Climate metrics recorded at a single weather station</h1>
+                <p>Explore how different climate metrics correlate within a single weather station.</p>
+            </div>
+
+            <div class='content'>
+                <div class='filters'>
+                    <label>Weather Station:</label>
+                    <select>
+                        <option>Melbourne Airport</option>
+                        <option>Ballarat Aerodrome</option>
+                        <option>Bairnsdale Airport</option>
+                        <option>Broome Airport</option>
+                        <option>Derby Aerodrome</option>
+                        <option>Mandora</option>
+                    </select>
+                    <label>Metric:</label>
+                    <select>
+                        <option>Humidity</option>
+                        <option>Temperature</option>
+                        <option>Precipitation</option>
+                    </select>
+                    <label>Start Year:</label>
+                    <input type='number' placeholder='YYYY'>
+                    <label>End Year:</label>
+                    <input type='number' placeholder='YYYY'>
+                    <button type='submit'>Apply Filters</button>
+                </div>
+
+            </div>
+        """;
+
+        String flag = context.queryParam("flag");
+        String metric = context.queryParam("metric");
+        String state = context.queryParam("state");
+        String startDate = context.queryParam("start");
+        String endDate = context.queryParam("end");
+        String stationFrom = context.queryParam("stationFrom");
+        String stationTo = context.queryParam("stationTo");
+
+        //String html = "<html><head><title>Metric Trends Summary</title>";
+        html += "<style>body { font-family: Arial; padding: 20px; } table { border-collapse: collapse; width: 100%; margin-top: 20px; } th, td { border: 1px solid #ccc; padding: 10px; text-align: center; } th { background-color: #f2f2f2; }</style>";
+        html += "</head><body>";
+        html += "<h1>Metric Trend Analysis</h1>";
+
+        html += "<table>";
+        html += "<tr><th>Metric Name</th><th>Total (first half)</th><th>Total (second half)</th><th>Change(%)</th><th>Metric Trend</th></tr>";
+
+        // Reference metric row
+        html += "<tr><td>Reference Metric</td><td>data</td><td>data</td><td>Calculated data</td><td>(selected)</td></tr>";
+
+        // Correlated metric rows
+        html += "<tr><td>Correlated Metric</td><td>data</td><td>data</td><td>Calculated data</td><td>Type of Correlation</td></tr>";
+        html += "<tr><td>Correlated Metric</td><td>data</td><td>data</td><td>Calculated data</td><td>Type of Correlation</td></tr>";
+
+        html += "</div></form>";
+        html += "</table>";
+        html += "</body></html>";
+        
+        context.html(html);
+
+
+        html += """
+            <footer>
+                <h2>Thank you</h2>
+                <p>For using this website to stay updated on all climate related fields</p>
+                <button class="policy-button">Click Here to View Our Policies</button>
+
+                <div class="footer-columns">
+                    <div>
+                        <strong>Site name</strong><br>
+                        <a href="#">LinkedIn</a>
+                        <a href="#">YouTube</a>
+                        <a href="#">Instagram</a>
+                    </div>
+                    <div>
+                        <strong>Topic</strong><br>
+                        Page<br>Page<br>Page
+                    </div>
+                    <div>
+                        <strong>Topic</strong><br>
+                        Page<br>Page<br>Page
+                    </div>
+                    <div>
+                        <strong>Topic</strong><br>
+                        Page<br>Page<br>Page
+                    </div>
+                </div>
+            </footer>
+        </body>
+        </html>
+    """;
+
+        context.html(html);
+    }
+}
+

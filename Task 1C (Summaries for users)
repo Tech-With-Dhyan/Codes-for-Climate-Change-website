@@ -1,0 +1,496 @@
+package app;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import io.javalin.http.Context;
+import io.javalin.http.Handler;
+
+public class PageST1C implements Handler {
+
+    public static final String URL = "/QualityAnalysis.html";
+
+    @Override
+    public void handle(Context context) {
+                String html = "<html>";
+                html += """
+
+                <head>
+    <title>My Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="common.css">
+  </head>
+""";
+
+html = html + "<link rel='stylesheet' type='text/css' href='common.css' />";
+        html = html + "</head>";
+
+        html = html + "<body>";
+
+        html = html + """
+            <div class='site-header'>
+                <div class='site-title'>Anthropomorphic Climate Change</div>
+                <div class='site-nav'>
+                    <a href='/'>Home</a>
+                    
+                    <div class="dropdown">
+                        <a class="dropbtn">Topics</a>
+                        <div class="dropdown-content"> 
+                            <a href='/QualityAnalysis.html'>Climate Quality Data Analysis (Task-1C)</a>
+                        </div>
+                    </div>
+
+                    <div class="dropdown">
+                        <a class="dropbtn">Research</a>
+                        <div class="dropdown-content"> 
+                            
+                            <a href='/MetricsTrendsPage.html'>Climate Metric Trends Over Time</a>
+
+                            <a href='/SelectedData.html'>Selected Data of Stations (Task-2C)</a>
+                            <a href='/SingleStation.html'>Metrics Recorded at a Single Station (Task-3C)</a>
+                            <a href='/MetricsPage.html'>Climate Metric Measurements</a>
+
+                        </div>
+                    </div>
+                
+                    
+                    <a href='/mission.html'>About</a>
+                    <a href='/help'>Help</a>
+                    
+                </div>
+            </div>
+            """;
+
+            html = html + """
+                <head>
+                <label style="font-size: 40px; font-weight: bold;">
+                    Uncover Meaning Behind Metric  
+                    <select name="metricsDrop" id="metricsDrop"
+
+                    style="
+                        font-size: 20px;
+                        padding: 10px 15px;
+                        width: 290px;
+                        border: 2px solid #444;
+                        border-radius: 8px;
+                        background-color: #fff;
+                        box-shadow: 2px 2px 6px rgba(11, 12, 11, 0.15);
+                        "
+                        >
+
+                        <optgroup label="Precipitation">
+                            <option value="precip">Precipitation</option>
+                            <option value="precipQual">Precipitation Quality</option>
+                            <option value="rainDaysNum">Rain Days Number</option>
+                            <option value="rainDaysMeasure">Rain Days Measure</option>
+                        </optgroup>
+
+                        <optgroup label = "Evaporation">
+                            <option value="evaporation">Evaporation</option>
+                            <option value="evapQual">Evaporation Quality</option>
+                            <option value="evapDaysNum">Evaporation Days Number</option>
+                        </optgroup>
+                        
+                        <optgroup label="Temperature">
+                            <option value="maxTemp">Max Temperature</option>
+                            <option value="maxTempQual">Max Temperature Quality</option>
+                            <option value="minTemp">Min Temperature</option>
+                            <option value="minTempQual">Min Temperature Quality</option>
+                        </optgroup>
+                        
+                        <optgroup label="Humidity">
+                            <option value="humid00">Humidity 00</option>
+                            <option value="humid00Qual">Humidity 00 Quality</option>
+                            <option value="humid03">Humidity 03</option>
+                            <option value="humid03Qual">Humidity 03 Quality</option>
+                            <option value="humid06">Humidity 06</option>
+                            <option value="humid06Qual">Humidity 06 Quality</option>
+                            <option value="humid09">Humidity 09</option>
+                            <option value="humid09Qual">Humidity 09 Quality</option>
+                            <option value="humid12">Humidity 12</option>
+                            <option value="humid12Qual">Humidity 12 Quality</option>
+                            <option value="humid15">Humidity 15</option>
+                            <option value="humid15Qual">Humidity 15 Quality</option>
+                            <option value="humid18">Humidity 18</option>
+                            <option value="humid18Qual">Humidity 18 Quality</option>
+                            <option value="humid21">Humidity 21</option>
+                            <option value="humid21Qual">Humidity 21 Quality</option>
+                        </optgroup>
+                        
+                        <optgroup label="Sunshine">
+                            <option value="sunshine">Sunshine</option>
+                            <option value="sunshineQual">Sunshine Quality</option>
+                        </optgroup>
+                        
+                        <optgroup label="Okta">
+                            <option value="okta00">Okta 00</option>
+                            <option value="okta00Qual">Okta 00 Quality</option>
+                            <option value="okta03">Okta 03</option>
+                            <option value="okta03Qual">Okta 03 Quality</option>
+                            <option value="okta06">Okta 06</option>
+                            <option value="okta06Qual">Okta 06 Quality</option>
+                            <option value="okta09">Okta 09</option>
+                            <option value="okta09Qual">Okta 09 Quality</option>
+                            <option value="okta12">Okta 12</option>
+                            <option value="okta12Qual">Okta 12 Quality</option>
+                            <option value="okta15">Okta 15</option>
+                            <option value="okta15Qual">Okta 15 Quality</option>
+                            <option value="okta18">Okta 18</option>
+                            <option value="okta18Qual">Okta 18 Quality</option>
+                            <option value="okta21">Okta 21</option>
+                            <option value="okta21Qual">Okta 21 Quality</option>
+                        </optgroup>
+                    </select>
+                </label>
+                    <meta charset="UTF-8">
+                    <title>Climate Data Quality Analysis</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 0;
+                            background: #F0F0F0;
+                        }
+                        header {
+                            background:rgb(240, 240, 240);
+                            padding: 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            border-bottom: 1px solid #ddd;
+                            
+                        }
+                        nav a {
+                            margin: 0 15px;
+                            text-decoration: none;
+                            color: black;
+                            font-weight: bold;
+                            
+                        }
+                        .container {
+                            padding: 40px;
+                        }
+                        
+                        .card {
+                            border: 1px solid #ccc;
+                            padding: 20px;
+                            margin-bottom: 20px;
+                            overflow-y: auto;
+                            max-height: 400px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 10px;
+                        }
+                        table, th, td {
+                            border: 1px solid #ccc;
+                        }
+                        th, td {
+                            padding: 10px;
+                            text-align: left;
+                        }
+                        .note-box {
+                            border: 1px solid #333;
+                            padding: 15px;
+                            width: fit-content;
+                            margin-top: 20px;
+                        }
+                        footer {
+                            background:rgb(175, 178, 175);
+                            padding: 30px;
+                            text-align: center;
+                            margin-top: 40px;
+                            border-top: 1px solid #ccc;
+                        }
+                        .footer-columns {
+                            display: flex;
+                            justify-content: center;
+                            gap: 40px;
+                            margin-top: 20px;
+                        }
+                        .footer-columns div {
+                            text-align: left;
+                        }
+                        .policy-button {
+                            margin-top: 10px;
+                            padding: 10px 20px;
+                            background:rgb(249, 245, 245);
+                            border: none;
+                            cursor: pointer;
+                            font-weight: bold;
+                        }
+                    </style>
+                </head>
+                <body>
+
+                    <header>
+                        </nav>
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+                        <style>
+                        * {box-sizing: border-box;}
+
+                            body {
+        
+
+                        .topnav {     background-color: #e9e9e9;
+                }
+
+      
+                        .topnav a.active {
+                        background-color: #2196F3;
+                        color: white;
+                    }
+
+      
+      .topnav input[type=text] {
+        padding: 6px;
+        margin-top: 8px;
+        font-size: 17px;
+        border: none;
+      }
+       
+        .topnav input[type=text] {
+          border: 1px solid #ccc;  
+        }
+      }
+      </style>
+      </head>
+      <body>
+
+            </header>
+                    <div class="container">
+                        <h1>Climate Data Quality Analysis</h1>
+
+                        <div class="card">
+                            <h2>Precipitation</h2>
+<div style="height: 20px;"></div>                            
+                            <p><strong>Purpose:</strong></p> <p> Provide users with accurate and accessible data on rainfall.</p>
+<div style="height: 20px;"></div>
+                            """;
+
+    // START: Dynamic Table from SQLite
+    html += "<table><tr><th>Labels (attributes)</th><th>Description</th></tr>";
+
+try {
+    // Correct path to DB (adjust if needed)
+    Connection conn = DriverManager.getConnection("jdbc:sqlite:database/climate.db");
+
+    Statement stmt = conn.createStatement();
+
+    // Table must match your DB schema
+    ResultSet rs = stmt.executeQuery("SELECT * FROM climate_attributes_P");
+
+    while (rs.next()) {
+        String label = rs.getString("label");        // or use column name like "label"
+        String description = rs.getString("description");  // or "description"
+        
+        html += "<tr><td>" + label + "</td><td>" + description + "</td><td>" ;
+    }
+
+    rs.close();
+    stmt.close();
+    conn.close();
+} catch (SQLException e) {
+    html += "<tr><td colspan='3'>Error fetching data: " + e.getMessage() + "</td></tr>";
+}
+
+html += "</table>";
+    // END: Dynamic Table
+
+    html += """
+<div style="height: 20px;"></div>
+                            <p><strong>Dataset Summary :-</strong></p>
+                            <p>This section offers comprehensive information on precipitation levels across various regions and time periods. Users can explore historical and recent rainfall data and view precipitation quality metrics.</p>
+<div style="height: 40px;"></div>
+
+
+                            <h2>Humidity</h2>
+<div style="height: 20px;"></div>                            
+                            <p><strong>Purpose:</strong></p>
+                            <p>Aims to deliver insights into atmospheric moisture levels.</p>
+<div style="height: 20px;"></div>
+                             """;
+
+    // START: Dynamic Table from SQLite
+    html += "<table><tr><th>Labels (attributes)</th><th>Description</th></tr>";
+
+try {
+    // Correct path to DB (adjust if needed)
+    Connection conn = DriverManager.getConnection("jdbc:sqlite:database/climate.db");
+
+    Statement stmt = conn.createStatement();
+
+    // Table must match your DB schema
+    ResultSet rs = stmt.executeQuery("SELECT * FROM climate_attributes_H");
+
+    while (rs.next()) {
+        String label = rs.getString("label");        // or use column name like "label"
+        String description = rs.getString("description");  // or "description"
+        
+        html += "<tr><td>" + label + "</td><td>" + description + "</td><td>" ;
+    }
+
+    rs.close();
+    stmt.close();
+    conn.close();
+} catch (SQLException e) {
+    html += "<tr><td colspan='3'>Error fetching data: " + e.getMessage() + "</td></tr>";
+}
+
+html += "</table>";
+    // END: Dynamic Table
+
+    html += """
+<div style="height: 20px;"></div>
+
+                            
+                            <p><strong>Dataset Summary :-</strong></p>
+                            <p>This section provides detailed data on relative humidity across different times and locations. Users can explore how humidity fluctuates throughout the day and seasons.</p>
+<div style="height: 40px;"></div>
+
+
+                            <h2>Evaporation</h2>
+<div style="height: 20px;"></div>                            
+                            <p><strong>Purpose:</strong></p>
+                            <p>Inform users about the rate at which water is converted to vapor from surfaces, a key factor in the hydrological cycle</p>
+<div style="height: 20px;"></div>
+                             """;
+
+    // START: Dynamic Table from SQLite
+    html += "<table><tr><th>Labels (attributes)</th><th>Description</th></tr>";
+
+try {
+    // Correct path to DB (adjust if needed)
+    Connection conn = DriverManager.getConnection("jdbc:sqlite:database/climate.db");
+
+    Statement stmt = conn.createStatement();
+
+    // Table must match your DB schema
+    ResultSet rs = stmt.executeQuery("SELECT * FROM climate_attributes_E");
+
+    while (rs.next()) {
+        String label = rs.getString("label");        // or use column name like "label"
+        String description = rs.getString("description");  // or "description"
+        
+        html += "<tr><td>" + label + "</td><td>" + description + "</td><td>" ;
+    }
+
+    rs.close();
+    stmt.close();
+    conn.close();
+} catch (SQLException e) {
+    html += "<tr><td colspan='3'>Error fetching data: " + e.getMessage() + "</td></tr>";
+}
+
+html += "</table>";
+    // END: Dynamic Table
+
+    html += """
+<div style="height: 20px;"></div>
+
+                            
+                            <p><strong>Dataset Summary :-</strong></p>
+                            <p>This section provides region-specific evaporation data based on observed meteorological conditions and users can track evaporation rates over time and understand their relationship with temperature, humidity, and wind.</p>
+<div style="height: 40px;"></div>
+
+
+                            <h2>Temperature</h2>
+<div style="height: 20px;"></div>                            
+                            <p><strong>Purpose:</strong></p>
+                            <p>Help users understand daily and seasonal thermal variations.</p>
+<div style="height: 20px;"></div>
+                             """;
+
+    // START: Dynamic Table from SQLite
+    html += "<table><tr><th>Labels (attributes)</th><th>Description</th></tr>";
+
+try {
+    // Correct path to DB (adjust if needed)
+    Connection conn = DriverManager.getConnection("jdbc:sqlite:database/climate.db");
+
+    Statement stmt = conn.createStatement();
+
+    // Table must match your DB schema
+    ResultSet rs = stmt.executeQuery("SELECT * FROM climate_attributes_T");
+
+    while (rs.next()) {
+        String label = rs.getString("label");        // or use column name like "label"
+        String description = rs.getString("description");  // or "description"
+        
+        html += "<tr><td>" + label + "</td><td>" + description + "</td><td>" ;
+    }
+
+    rs.close();
+    stmt.close();
+    conn.close();
+} catch (SQLException e) {
+    html += "<tr><td colspan='3'>Error fetching data: " + e.getMessage() + "</td></tr>";
+}
+
+html += "</table>";
+    // END: Dynamic Table
+
+    html += """
+<div style="height: 20px;"></div>
+
+                            <p><strong>Dataset Summary :-</strong></p>
+                            <p>Users can access maximum and minimum temperature records, compare historical and current data, and identify trends across different regions.</p>
+                        </div>
+
+
+
+
+
+
+
+
+                        <div class="note-box">
+                            <strong>Points to noted :-</strong><br>
+                            Data is collected from multiple weather station across Australia<br>
+                            This data spans from 01-01-1970 to 31-12-2020
+                        </div>
+                    </div>
+
+                    <footer>
+                        <h2>Thank you</h2>
+                        <p>For using this website to stay updated on all climate related fields</p>
+                        <button class="policy-button">Click Here to View Our Policies</button>
+
+                        <div class="footer-columns">
+                            <div>
+                                <strong>Site name</strong><br>
+                                <a href="#">LinkedIn</a><br>
+                                <a href="#">YouTube</a><br>
+                                <a href="#">Instagram</a>
+                            </div>
+                            <div>
+                                <strong>Topic</strong><br>
+                                Page<br>Page<br>Page
+                            </div>
+                            <div>
+                                <strong>Topic</strong><br>
+                                Page<br>Page<br>Page
+                            </div>
+                            <div>
+                                <strong>Topic</strong><br>
+                                Page<br>Page<br>Page
+                            </div>
+                        </div>
+                    </footer>
+
+                </body>
+                </html>
+                """;
+
+
+        context.contentType("text/html");
+        context.result(html);
+    }
+
+
+}
+

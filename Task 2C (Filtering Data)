@@ -1,0 +1,490 @@
+package app;
+
+//import java.lang.classfile.ClassFile;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import io.javalin.http.Context;
+import io.javalin.http.Handler;
+
+public class PageST2C implements Handler {
+
+    public static final String URL = "/SelectedData.html";
+
+    @Override
+    public void handle(Context context) throws Exception {
+        String html = "<html>";
+        html += """
+
+        <head>
+            <title>My Page</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+            <link rel='stylesheet' type='text/css' href='common.css' />
+            <meta charset="UTF-8">
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background: #F0F0F0;
+                }
+                header {
+                    background: #fff;
+                    padding: 15px 30px;
+                    box-shadow: 0 2px 4px rgba(10, 10, 9, 0.1);
+                }
+                nav a {
+                    margin-right: 15px;
+                    text-decoration: none;
+                    color: #333;
+                }
+                main {
+                    padding: 20px 30px;
+                }
+                h2, h3 {
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                }
+                .filters, .note, .table-section, .summary, .thankyou {
+                    background: #F0F0F0;
+                    margin: 10px 0;
+                    padding: 15px;
+                    border-radius: 8px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+                .filters select, .filters input {
+                    margin-right: 10px;
+                    padding: 5px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 10px;
+                }
+                th, td {
+                    border: 1px solid #ccc;
+                    padding: 8px;
+                    text-align: center;
+                }
+                .dropdowns {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 20px;
+                    margin-bottom: 10px;
+                }
+                .dropdowns div {
+                    background: #fff;
+                    padding: 10px;
+                    border-radius: 6px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                footer {
+                    background-color: #A5A9A6;
+                    color: black;
+                    padding: 30px 0;
+                    text-align: center;
+                    font-family: Arial, sans-serif;
+                }
+                footer h2 {
+                    margin: 0 0 10px 0;
+                }
+                footer p {
+                    margin: 0 0 20px 0;
+                }
+                .policy-button {
+                    padding: 10px 20px;
+                    background-color: #f0f0f0;
+                    border: none;
+                    font-weight: bold;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    margin-bottom: 20px;
+                }
+                .footer-columns {
+                    display: flex;
+                    justify-content: center;
+                    gap: 40px;
+                    flex-wrap: wrap;
+                    margin-top: 10px;
+                }
+                .footer-columns div {
+                    text-align: left;
+                }
+                .footer-columns a {
+                    display: block;
+                    color: purple;
+                    text-decoration: none;
+                    margin: 4px 0;
+                }
+            </style>
+        </head>
+
+        <body>
+            <div class='site-header'>
+                <div class='site-title'>Anthropomorphic Climate Change</div>
+                <div class='site-nav'>
+                    <a href='/'>Home</a>
+                    <div class="dropdown">
+                        <a class="dropbtn">Topics</a>
+                        <div class="dropdown-content">
+                            <a href='/QualityAnalysis.html'>Climate Quality Data Analysis (Task-1C)</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a class="dropbtn">Research</a>
+                        <div class="dropdown-content">
+                            
+                            <a href='/MetricsTrendsPage.html'>Climate Metric Trends Over Time</a>
+                            <a href='/SelectedData.html'>Selected Data of Stations (Task-2C)</a>
+                            <a href='/SingleStation.html'>Metrics Recorded at a Single Station (Task-3C)</a>
+                            <a href='/MetricsPage.html'>Climate Metric Measurements</a>
+                        </div>
+                    </div>
+                    
+                    <a href='/mission.html'>About</a>
+                    <a href='/help'>Help</a>
+                </div>
+            </div>
+
+            <main>
+                <div class="table-section">
+                    <h2>Data Filters</h2>
+                    """;
+
+    // START: Dynamic Table from SQLite
+        String flag = context.queryParam("flag");
+        String metric = context.queryParam("metric");
+        String state = context.queryParam("state");
+        String startDate = context.queryParam("start");
+        String endDate = context.queryParam("end");
+        String stationFrom = context.queryParam("stationFrom");
+        String stationTo = context.queryParam("stationTo");
+ 
+
+        // Filter Form
+        html += "<form method='get' action='/SelectedData.html'><div class='filters'>";
+
+       
+        html += "<select name='metric'>";
+        html += "<option value=''>Select Metric</option>";
+
+        html += "<option value='Precipitation'" + ("Precipitation".equals(metric) ? " selected" : "") + ">Precipitation</option>";
+        html += "<option value='RainDaysNum'" + ("RainDaysNum".equals(metric) ? " selected" : "") + ">RainDaysNum</option>";
+        html += "<option value='Evaporation'" + ("Evaporation".equals(metric) ? " selected" : "") + ">Evaporation</option>";
+        html += "<option value='MaxTemp'" + ("MaxTemp".equals(metric) ? " selected" : "") + ">MaxTemp</option>";
+        html += "<option value='MinTemp'" + ("MinTemp".equals(metric) ? " selected" : "") + ">MinTemp</option>";
+        html += "<option value='Humid00'" + ("Humid00".equals(metric) ? " selected" : "") + ">Humid00</option>";
+        html += "<option value='Humid03'" + ("Humid03".equals(metric) ? " selected" : "") + ">Humid03</option>";
+        html += "<option value='Humid06'" + ("Humid06".equals(metric) ? " selected" : "") + ">Humid06</option>";
+        html += "<option value='Humid09'" + ("Humid09".equals(metric) ? " selected" : "") + ">Humid09</option>";
+        html += "<option value='Humid12'" + ("Humid12".equals(metric) ? " selected" : "") + ">Humid12</option>";
+        html += "<option value='Humid15'" + ("Humid15".equals(metric) ? " selected" : "") + ">Humid15</option>";
+        html += "<option value='Humid18'" + ("Humid18".equals(metric) ? " selected" : "") + ">Humid18</option>";
+        html += "<option value='Humid21'" + ("Humid21".equals(metric) ? " selected" : "") + ">Humid21</option>";
+        html += "<option value='Sunshine'" + ("Sunshine".equals(metric) ? " selected" : "") + ">Sunshine</option>";
+        html += "<option value='Okta00'" + ("Okta00".equals(metric) ? " selected" : "") + ">Okta00</option>";
+        html += "<option value='Okta03'" + ("Okta03".equals(metric) ? " selected" : "") + ">Okta03</option>";
+        html += "<option value='Okta06'" + ("Okta06".equals(metric) ? " selected" : "") + ">Okta06</option>";
+        html += "<option value='Okta09'" + ("Okta09".equals(metric) ? " selected" : "") + ">Okta09</option>";
+        html += "<option value='Okta12'" + ("Okta12".equals(metric) ? " selected" : "") + ">Okta12</option>";
+        html += "<option value='Okta15'" + ("Okta15".equals(metric) ? " selected" : "") + ">Okta15</option>";
+        html += "<option value='Okta18'" + ("Okta18".equals(metric) ? " selected" : "") + ">Okta18</option>";
+        html += "<option value='Okta21'" + ("Okta21".equals(metric) ? " selected" : "") + ">Okta21</option>";
+
+        html += "</select>";
+
+        html += "<input type='date' name='start' value='" + (startDate != null ? startDate : "") + "'>";
+        html += "<input type='date' name='end' value='" + (endDate != null ? endDate : "") + "'>";
+
+        html += "<select name='state'>";
+        html += "<option value=''>Select State</option>";
+        String[] states = { "AAT", "AET", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA" };
+        for (String st : states) {
+            html += "<option value='" + st + "'" + (st.equals(state) ? " selected" : "") + ">" + st + "</option>";
+        }
+        html += "</select>";
+
+        html += "<input type='text' name='stationFrom' maxlength='6' placeholder='From Station ID' value='" + (stationFrom != null ? stationFrom : "") + "'>";
+        html += "<input type='text' name='stationTo' maxlength='6' placeholder='To Station ID' value='" + (stationTo != null ? stationTo : "") + "'>";
+
+        html += "<button type='submit'>Apply Filters</button>";
+        html += "</div></form>";
+
+
+        html += """
+                
+                <div class="note">
+                    <strong>Note:</strong><br>
+                    <b>Quality flags</b> indicate the reliability of data measurement.<br>
+                    They are essential in filtering reliable data for quality control and analysis.
+                </div>
+
+        """;
+
+
+        //Table Output
+        html += "<div class='table-section'><h3>Results:</h3><table>";
+        html += "<tr><th>Location</th><th>Date</th><th>Metric</th><th>Value</th><th>Quality</th></tr>";
+
+        if (metric != null && !metric.isEmpty()) {
+
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:database/climate.db")) {
+            Statement stmt = conn.createStatement();
+
+            StringBuilder query = new StringBuilder("SELECT Location, DMY ");
+            if(metric.equals("Precipitation"))
+            {
+               query.append(", Precipitation COL1, PrecipQual COL2");
+            }
+            if(metric.equals("RainDaysNum"))
+            {
+                query.append(", RainDaysNum COL1, RainDaysMeasure COL2");
+            }
+            if (metric.equals("Evaporation")) {
+                query.append(", Evaporation COL1, EvapQual COL2");
+            }
+            if (metric.equals("MaxTemp")) {
+                query.append(", MaxTemp COL1, MaxTempQual COL2");
+            }
+            if (metric.equals("MinTemp")) {
+                query.append(", MinTemp COL1, MinTempQual COL2");
+            }
+            if (metric.equals("Humid00")) {
+                query.append(", Humid00 COL1, Humid00Qual COL2");
+            }
+            if (metric.equals("Humid03")) {
+                query.append(", Humid03 COL1, Humid03QUal COL2");
+            }
+            if (metric.equals("Humid06")) {
+                query.append(", Humid06 COL1, Humid06Qual COL2");
+            }
+            if (metric.equals("Humid09")) {
+                query.append(", Humid09 COL1, Humid09Qual COL2");
+            }
+            if (metric.equals("Humid12")) {
+                query.append(", Humid12 COL1, Humid12Qual COL2");
+            }
+            if (metric.equals("Humid15")) {
+                query.append(", Humid15 COL1, Humid15Qual COL2");
+            }
+            if (metric.equals("Humid18")) {
+                query.append(", Humid18 COL1, Humid18Qual COL2");
+            }
+            if (metric.equals("Humid21")) {
+                query.append(", Humid21 COL1, Humid21Qual COL2");
+            }
+            if (metric.equals("Sunshine")) {
+                query.append(", Sunshine COL1, SunshineQual COL2");
+            }
+            if (metric.equals("Okta00")) {
+                query.append(", Okta00 COL1, Okta00Qual COL2");
+            }
+            if (metric.equals("Okta03")) {
+                query.append(", Okta03 COL1, Okta03Qual COL2");
+            }
+            if (metric.equals("Okta06")) {
+                query.append(", Okta06 COL1, Okta06Qual COL2");
+            }
+            if (metric.equals("Okta09")) {
+                query.append(", Okta09 COL1, Okta09Qual COL2");
+            }
+            if (metric.equals("Okta12")) {
+                query.append(", Okta12 COL1, Okta12Qual COL2");
+            }
+            if (metric.equals("Okta15")) {
+                query.append(", Okta15 COL1, Okta15Qual COL2");
+            }
+            if (metric.equals("Okta18")) {
+                query.append(", Okta18 COL1, Okta18Qual COL2");
+            }
+            if (metric.equals("Okta21")) {
+                query.append(", Okta21 COL1, Okta21Qual COL2");
+            }
+
+            query.append(" FROM ");
+            query.append(state); 
+            query.append(" WHERE 1=1");
+
+            if (stationFrom != null && !stationFrom.isEmpty()) query.append(" AND location >= '").append(stationFrom).append("'");
+            if (stationTo != null && !stationTo.isEmpty()) query.append(" AND location <= '").append(stationTo).append("'");
+
+            if (startDate != null && !startDate.isEmpty()) query.append(" AND printf('%04d-%02d-%02d',CAST(substr(dmy, length(substr(dmy, 1, instr(dmy, '/') + instr(substr(dmy, instr(dmy, '/') + 1), '/'))) + 1) AS INTEGER), CAST(substr(dmy, instr(dmy, '/') + 1, instr(substr(dmy, instr(dmy, '/') + 1), '/') - 1) AS INTEGER), CAST(substr(dmy, 1, instr(dmy, '/') - 1) AS INTEGER)) >= '").append(startDate).append("'");
+            if (endDate != null && !endDate.isEmpty()) query.append(" AND printf('%04d-%02d-%02d',CAST(substr(dmy, length(substr(dmy, 1, instr(dmy, '/') + instr(substr(dmy, instr(dmy, '/') + 1), '/'))) + 1) AS INTEGER), CAST(substr(dmy, instr(dmy, '/') + 1, instr(substr(dmy, instr(dmy, '/') + 1), '/') - 1) AS INTEGER), CAST(substr(dmy, 1, instr(dmy, '/') - 1) AS INTEGER)) <= '").append(endDate).append("'");
+
+            System.out.println(query);
+
+            //Add filters to SQL query
+            
+            ResultSet rs = stmt.executeQuery(query.toString());
+
+            while (rs.next()) {
+                html += "<tr>";
+                html += "<td>" + rs.getString("Location") + "</td>";
+                html += "<td>" + rs.getString("DMY") + "</td>";
+                html += "<td>" + metric + "</td>";
+                html += "<td>" + rs.getString("COL1") + "</td>";
+                html += "<td>" + rs.getString("COL2") + "</td>";
+                html += "</tr>";
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            html += "<tr><td colspan='5'>Error: " + e.getMessage() + "</td></tr>";
+        } 
+    }
+        html += "</table></div></main></body></html>";
+        context.html(html);
+    // END: Dynamic Table
+    
+    
+html += "<div class='table-section'>";
+html += "<h3>Summary: Total counts of the Flags</h3>";
+html += "<p>This table displays the total count of quality flags grouped by their respective climate records, based on all available data in the database.</p>";
+        
+html += "<table><tr><th>Flag</th><th>Metric Count</th></tr>";
+
+if (metric != null && !metric.isEmpty()) {
+    try (Connection conn = DriverManager.getConnection("jdbc:sqlite:database/climate.db")) {
+        Statement stmt = conn.createStatement();
+        StringBuilder avgQuery = new StringBuilder("SELECT ");
+        if(metric.equals("Precipitation"))
+        {
+        avgQuery.append(" PrecipQual COL1, count(PrecipQual) COL2");
+        }
+        if(metric.equals("RainDaysNum"))
+        {
+            avgQuery.append(" RainDaysMeasure COL1, count(RainDaysMeasure) COL2");
+        }
+        if (metric.equals("Evaporation")) {
+            avgQuery.append(" EvapQual COL1, count(EvapQual) COL2");
+        }
+        if (metric.equals("MaxTemp")) {
+            avgQuery.append(" MaxTempQual COL1, count(MaxTempQual) COL2");
+        }
+        if (metric.equals("MinTemp")) {
+            avgQuery.append(" MinTempQual COL1, count(MinTempQual) COL2");
+        }
+        if (metric.equals("Humid00")) {
+            avgQuery.append(" Humid00Qual COL1, count(Humid00Qual) COL2");
+        }
+        if (metric.equals("Humid03")) {
+            avgQuery.append(" Humid03QUal COL1, count(Humid03QUal) COL2");
+        }
+        if (metric.equals("Humid06")) {
+            avgQuery.append(" Humid06Qual COL1, count(Humid06Qual) COL2");
+        }
+        if (metric.equals("Humid09")) {
+            avgQuery.append(" Humid09Qual COL1, count(Humid09Qual) COL2");
+        }
+        if (metric.equals("Humid12")) {
+            avgQuery.append(" Humid12Qual COL1, count(Humid12Qual) COL2");
+        }
+        if (metric.equals("Humid15")) {
+            avgQuery.append(" Humid15Qual COL1, count(Humid15Qual) COL2");
+        }
+        if (metric.equals("Humid18")) {
+            avgQuery.append(" Humid18Qual COL1, count(Humid18Qual) COL2");
+        }
+        if (metric.equals("Humid21")) {
+            avgQuery.append(" Humid21Qual COL1, count(Humid21Qual) COL2");
+        }
+        if (metric.equals("Sunshine")) {
+            avgQuery.append(" SunshineQual COL1, count(SunshineQual) COL2");
+        }
+        if (metric.equals("Okta00")) {
+            avgQuery.append(" Okta00Qual COL1, count(Okta00Qual) COL2");
+        }
+        if (metric.equals("Okta03")) {
+            avgQuery.append(" Okta03Qual COL1, count(Okta03Qual) COL2");
+        }
+        if (metric.equals("Okta06")) {
+            avgQuery.append(" Okta06Qual COL1, count(Okta06Qual) COL2");
+        }
+        if (metric.equals("Okta09")) {
+            avgQuery.append(" Okta09Qual COL1, count(Okta09Qual) COL2");
+        }
+        if (metric.equals("Okta12")) {
+            avgQuery.append(" Okta12Qual COL1, count(Okta12Qual) COL2");
+        }
+        if (metric.equals("Okta15")) {
+            avgQuery.append(" Okta15Qual COL1, count(Okta15Qual) COL2");
+        }
+        if (metric.equals("Okta18")) {
+            avgQuery.append(" Okta18Qual COL1, count(Okta18Qual) COL2");
+        }
+        if (metric.equals("Okta21")) {
+            avgQuery.append(" Okta21Qual COL1, count(Okta21Qual) COL2");
+        }
+
+        avgQuery.append(" FROM ");
+        avgQuery.append(state); 
+        avgQuery.append(" WHERE 1=1");
+
+        if (stationFrom != null && !stationFrom.isEmpty()) avgQuery.append(" AND location >= '").append(stationFrom).append("'");
+        if (stationTo != null && !stationTo.isEmpty()) avgQuery.append(" AND location <= '").append(stationTo).append("'");
+
+        if (startDate != null && !startDate.isEmpty()) avgQuery.append(" AND printf('%04d-%02d-%02d',CAST(substr(dmy, length(substr(dmy, 1, instr(dmy, '/') + instr(substr(dmy, instr(dmy, '/') + 1), '/'))) + 1) AS INTEGER), CAST(substr(dmy, instr(dmy, '/') + 1, instr(substr(dmy, instr(dmy, '/') + 1), '/') - 1) AS INTEGER), CAST(substr(dmy, 1, instr(dmy, '/') - 1) AS INTEGER)) >= '").append(startDate).append("'");
+        if (endDate != null && !endDate.isEmpty()) avgQuery.append(" AND printf('%04d-%02d-%02d',CAST(substr(dmy, length(substr(dmy, 1, instr(dmy, '/') + instr(substr(dmy, instr(dmy, '/') + 1), '/'))) + 1) AS INTEGER), CAST(substr(dmy, instr(dmy, '/') + 1, instr(substr(dmy, instr(dmy, '/') + 1), '/') - 1) AS INTEGER), CAST(substr(dmy, 1, instr(dmy, '/') - 1) AS INTEGER)) <= '").append(endDate).append("'");
+
+        avgQuery.append(" AND col1 <> ' ' group by col1 ");
+        System.out.println(avgQuery);
+
+        ResultSet avgRs = stmt.executeQuery(avgQuery.toString());
+
+        while (avgRs.next()) {
+            String flagLabel = avgRs.getString("COL1");
+            double avg = avgRs.getDouble("COL2");
+
+            html += "<tr><td>" + flagLabel + "</td><td>" + String.format("%.0f", avg) + "</td></tr>";
+        }
+
+        avgRs.close();
+        stmt.close();
+    } catch (SQLException e) {
+        html += "<tr><td colspan='2'>Error: " + e.getMessage() + "</td></tr>";
+    }
+}
+html += "</table></div>";
+
+
+html +="""
+            </main>
+
+            <footer>
+                <h2>Thank you</h2>
+                <p>For using this website to stay updated on all climate related fields</p>
+                <button class="policy-button">Click Here to View Our Policies</button>
+
+                <div class="footer-columns">
+                    <div>
+                        <strong>Site name</strong><br>
+                        <a href="#">LinkedIn</a>
+                        <a href="#">YouTube</a>
+                        <a href="#">Instagram</a>
+                    </div>
+                    <div>
+                        <strong>Topic</strong><br>
+                        Page<br>Page<br>Page
+                    </div>
+                    <div>
+                        <strong>Topic</strong><br>
+                        Page<br>Page<br>Page
+                    </div>
+                    <div>
+                        <strong>Topic</strong><br>
+                        Page<br>Page<br>Page
+                    </div>
+                </div>
+            </footer>
+        </body>
+        </html>
+        """;
+
+        context.html(html);
+    }
+    
+}
